@@ -1,6 +1,6 @@
 {
   "name": "redish",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Save links to an RSS feed you can ignore from anywhere.",
   "keywords": [
     "read-it-later",
@@ -21,6 +21,8 @@
     "start": "node src/server.js"
   },
   "dependencies": {
-    "fast-xml-parser": "^5.2.3"
+    "@hono/node-server": "^1.14.3",
+    "fast-xml-parser": "^5.2.3",
+    "hono": "^4.7.10"
   }
 }

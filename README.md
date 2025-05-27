@@ -24,11 +24,13 @@ Add an item to a feed.
 
 | Name | Type   | Required | Description       |
 | ---- | ------ | -------- | ----------------- |
-| url  | string | true     | Link for the item |
+| link | string | true     | Link for the item |
 
 #### Response
 
-`200 OK`
+```json
+{}
+```
 
 ### 🟢 `GET /feeds/{id}`
 
