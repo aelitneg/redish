@@ -14,7 +14,11 @@ FROM node:lts-alpine
 
 WORKDIR /app
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+ARG USER_ID=1001
+ARG GROUP_ID=1001
+
+RUN addgroup -S appgroup -g ${GROUP_ID} && \
+    adduser -S appuser -G appgroup -u ${USER_ID}
 
 COPY package*.json ./
 RUN npm ci --only=production
