@@ -1,4 +1,5 @@
 import { serve } from '@hono/node-server';
+import { serveStatic } from '@hono/node-server/serve-static';
 import app from './app.js';
 
 const port = process.env.PORT ?? 3000;
@@ -11,6 +12,8 @@ const server = serve({
 server.on('listening', () => {
   console.info(`🌐 server is listening on port ${port}`);
 });
+
+app.use('/*', serveStatic({ root: './web/public' }));
 
 /**
  * Graceful shutdown.
