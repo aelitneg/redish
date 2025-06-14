@@ -1,3 +1,4 @@
 /data
 /feeds
 /node_modules
+.env

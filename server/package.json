@@ -1,0 +1,45 @@
+{
+  "name": "redish-server",
+  "version": "0.1.0",
+  "description": "Save links to an RSS feed you can ignore from anywhere.",
+  "keywords": [
+    "read-it-later",
+    "link-saver",
+    "bookmarking",
+    "rss",
+    "rss-feed",
+    "save-for-later",
+    "url-saver"
+  ],
+  "homepage": "https://github.com/aelitneg/redish#readme",
+  "bugs": {
+    "url": "https://github.com/aelitneg/redish/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aelitneg/redish.git"
+  },
+  "license": "AGPL-3.0-or-later",
+  "author": "Andrew Gentile <andrew@agentile.dev>",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx --watch src/server.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.3",
+    "better-auth": "^1.2.8",
+    "drizzle-orm": "^0.44.1",
+    "fast-xml-parser": "^5.2.3",
+    "hono": "^4.7.10",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/pg": "^8.15.2",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
