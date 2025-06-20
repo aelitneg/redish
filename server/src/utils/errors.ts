@@ -20,8 +20,9 @@ export class ForbiddenError extends Error {
 export class NotFoundError extends Error {
   code: string = 'NOT_FOUND';
   name: string = 'NotFoundError';
-  resource: string;
-  constructor(message: string, resource: string) {
+  resource?: string;
+  status_code: ContentfulStatusCode = 404;
+  constructor(message: string, resource?: string) {
     super(message);
     this.resource = resource;
   }

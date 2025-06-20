@@ -3,7 +3,11 @@ import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import { fileStorage } from '../storage/fileStorage.js';
 import { db } from '../db/index.js';
 import { feed } from '../db/schema.js';
-import { BadRequestError, ForbiddenError } from '../utils/errors.js';
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from '../utils/errors.js';
 import { isValidUUID } from '../utils/isValidUUID.js';
 
 const DEFAULT_TITLE = 'Redish';
@@ -106,6 +110,27 @@ async function getFeed(userId: string, feedId: string): Promise<string> {
 }
 
 /**
+ * Fetch a public RSS feed by ID.
+ * @returns {Promise<string>} XML of RSS feed
+ */
+async function getPublicFeed(feedId: string): Promise<string> {
+  if (!isValidUUID(feedId)) {
+    throw new BadRequestError('invalid feed ID');
+  }
+
+  const feedRecord = await db.query.feed.findFirst({
+    columns: { id: true, userId: true },
+    where: eq(feed.id, feedId),
+  });
+
+  if (!feedRecord) {
+    throw new NotFoundError(`Feed ${feedId} not found.`);
+  }
+
+  return fileStorage.read(`${feedRecord.userId}/${feedRecord.id}.xml`);
+}
+
+/**
  * Update a feed by ID.
  */
 function addItemToFeed(
@@ -143,6 +168,7 @@ function addItemToFeed(
 export const feedsService = {
   createFeed,
   getFeed,
+  getPublicFeed,
   listFeeds,
   addItemToFeed,
 };
