@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { auth } from './auth';
-import feeds from './routes/feeds';
+import { auth } from './auth.js';
+import feeds from './routes/feeds.js';
 
 const app = new Hono<{
   // Make user and session a part of context

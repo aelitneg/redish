@@ -1,0 +1,8 @@
+services:
+  server:
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true

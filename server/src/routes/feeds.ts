@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { auth } from '../auth';
-import { feedsService } from '../services/feedsService';
-import { BadRequestError, ForbiddenError } from '../utils/errors';
+import { auth } from '../auth.js';
+import { feedsService } from '../services/feedsService.js';
+import { BadRequestError, ForbiddenError } from '../utils/errors.js';
 
 const feeds = new Hono<{
   // Make user and session a part of context

@@ -1,10 +1,10 @@
 import { and, eq } from 'drizzle-orm';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import { fileStorage } from '../storage/fileStorage.js';
-import { db } from '../db';
+import { db } from '../db/index.js';
 import { feed } from '../db/schema.js';
-import { BadRequestError, ForbiddenError } from '../utils/errors';
-import { isValidUUID } from '../utils/isValidUUID';
+import { BadRequestError, ForbiddenError } from '../utils/errors.js';
+import { isValidUUID } from '../utils/isValidUUID.js';
 
 const DEFAULT_TITLE = 'Redish';
 const DEFAULT_DESCRIPTION =

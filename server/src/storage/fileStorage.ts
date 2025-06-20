@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { NotFoundError } from '../utils/errors';
+import { NotFoundError } from '../utils/errors.js';
 
 const BASE_PATH = `${process.cwd()}/data`;
 
