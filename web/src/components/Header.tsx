@@ -23,10 +23,13 @@ export function Header() {
     if (!session) return;
     (async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/feeds`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/feeds`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          },
+        );
         if (!response.ok) {
           const { error } = await response.json();
           console.error(`Request Failed ${response.status} ${error}`);
@@ -45,7 +48,9 @@ export function Header() {
   const handleCopyFeedUrl = async () => {
     if (!feedId) return;
     try {
-      await navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_API_URL}/feeds/${feedId}`);
+      await navigator.clipboard.writeText(
+        `${process.env.NEXT_PUBLIC_API_URL}/feeds/${feedId}`,
+      );
       toast.success('Feed URL copied to clipboard');
     } catch {
       toast.error('Failed to copy feed URL');
@@ -64,7 +69,7 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="menu">
-              <MenuIcon className="size-6"/>
+              <MenuIcon className="size-6" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
