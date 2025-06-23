@@ -1,6 +1,6 @@
 {
   "name": "redish-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Save links to an RSS feed you can ignore from anywhere.",
   "keywords": [
     "read-it-later",
