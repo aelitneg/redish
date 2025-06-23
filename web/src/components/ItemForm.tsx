@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { ChevronDownIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Form,
@@ -13,6 +14,12 @@ import {
   FormMessage,
 } from './ui/form';
 import { Input } from './ui/input';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from './ui/collapsible';
+import { useQueryStringFilter } from '../hooks/useQueryStringFilter';
 
 const LINK_LABELS = [
   'Paste a URL you solemnly swear to revisit.',
@@ -54,6 +61,10 @@ export function ItemForm() {
     linkLabel: '',
     buttonText: '',
   });
+  const [originalUrl, setOriginalUrl] = useState<string>('');
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+
+  const { isFilterEnabled, toggleFilter, filterUrl } = useQueryStringFilter();
 
   useEffect(() => {
     setLabels(getRandomLabels());
@@ -81,6 +92,41 @@ export function ItemForm() {
       link: '',
     },
   });
+
+  // Apply filtering when toggle state changes
+  useEffect(() => {
+    const currentValue = form.getValues('link');
+    if (currentValue) {
+      if (isFilterEnabled) {
+        // Apply filter to current URL (use original if available, otherwise current)
+        const urlToFilter = originalUrl || currentValue;
+        const filtered = filterUrl(urlToFilter);
+        if (filtered !== currentValue) {
+          form.setValue('link', filtered);
+        }
+      } else {
+        // Restore original URL if available
+        if (originalUrl && originalUrl !== currentValue) {
+          form.setValue('link', originalUrl);
+        }
+      }
+    }
+  }, [isFilterEnabled, form, filterUrl, originalUrl]);
+
+  function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    // Get the pasted content
+    const pastedText = event.clipboardData.getData('text');
+
+    // Store the original URL
+    setOriginalUrl(pastedText);
+
+    // Filter the URL if filtering is enabled
+    const filteredUrl = filterUrl(pastedText);
+
+    // Always prevent default and set the appropriate value
+    event.preventDefault();
+    form.setValue('link', filteredUrl);
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -122,12 +168,52 @@ export function ItemForm() {
                 {labels.linkLabel}
               </FormLabel>
               <FormControl>
-                <Input type="url" {...field} />
+                <Input type="url" {...field} onPaste={handlePaste} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Options Collapsible */}
+        <div className="flex flex-col items-center space-y-2">
+          <Collapsible open={isOptionsOpen} onOpenChange={setIsOptionsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground"
+              >
+                Options
+                <ChevronDownIcon
+                  className={`ml-1 h-4 w-4 transition-transform ${isOptionsOpen ? 'rotate-180' : ''}`}
+                />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2">
+              <div className="flex items-center space-x-2 px-4 py-2 border border-border rounded-md bg-muted/50">
+                <input
+                  id="filter-query-string"
+                  type="checkbox"
+                  checked={isFilterEnabled}
+                  onChange={toggleFilter}
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary focus:ring-2"
+                  aria-describedby="filter-query-string-description"
+                />
+                <label
+                  htmlFor="filter-query-string"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Filter Query String
+                </label>
+                <span id="filter-query-string-description" className="sr-only">
+                  Remove tracking parameters from URLs when pasting
+                </span>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
         <Button type="submit">{labels.buttonText}</Button>
       </form>
     </Form>
