@@ -95,6 +95,7 @@ export function ItemForm() {
 
       if (response.ok) {
         toast.success('Link added to feed');
+        form.reset();
         setLabels(getRandomLabels());
       } else {
         const { error } = await response.json();
