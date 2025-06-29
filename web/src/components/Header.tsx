@@ -59,7 +59,7 @@ export function Header() {
 
   async function signOut() {
     await authClient.signOut();
-    router.push('/signin');
+    router.replace('/signin');
   }
 
   return (

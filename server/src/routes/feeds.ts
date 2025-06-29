@@ -1,11 +1,7 @@
 import { Hono } from 'hono';
 import { auth } from '../auth.js';
 import { feedsService } from '../services/feedsService.js';
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from '../utils/errors.js';
+import { ForbiddenError } from '../utils/errors.js';
 
 const feeds = new Hono<{
   // Make user and session a part of context
@@ -19,32 +15,19 @@ const feeds = new Hono<{
  * Fetch feed by ID, returning XML
  */
 feeds.get('/:id', async (c) => {
-  try {
-    const feedId = c.req.param('id');
-    const feed = await feedsService.getPublicFeed(feedId);
+  const feedId = c.req.param('id');
+  const feed = await feedsService.getPublicFeed(feedId);
 
-    c.header('Content-Type', 'application/xml');
-    return c.text(feed);
-  } catch (error) {
-    if (
-      error instanceof BadRequestError ||
-      error instanceof ForbiddenError ||
-      error instanceof NotFoundError
-    ) {
-      return c.json({ error: error.message }, error.status_code);
-    }
-
-    throw error;
-  }
+  c.header('Content-Type', 'application/xml');
+  return c.text(feed);
 });
 
 /**
  * Feeds routes require authentication
  */
 feeds.use('*', async (c, next) => {
-  
   if (!c.get('session')) {
-    return c.json({ error: 'Unauthorized' }, 401);
+    throw new ForbiddenError();
   }
   return next();
 });
@@ -61,30 +44,20 @@ feeds.post('/', async (c) => {
  * List all feeds for a user
  */
 feeds.get('/', async (c) => {
-  try {
-    const feeds = await feedsService.listFeeds(c.get('session')?.userId!);
-    return c.json(feeds);
-  } catch (error) {}
+  const feeds = await feedsService.listFeeds(c.get('session')?.userId!);
+  return c.json(feeds);
 });
 
 /**
  * Add a new item to a feed
  */
 feeds.post('/:id/items', async (c) => {
-  try {
-    const feedId = c.req.param('id');
-    const [link] = c.req.queries('link') ?? [];
+  const feedId = c.req.param('id');
+  const [link] = c.req.queries('link') ?? [];
 
-    await feedsService.addItemToFeed(c.get('session')?.userId!, feedId, link);
+  await feedsService.addItemToFeed(c.get('session')?.userId!, feedId, link);
 
-    return c.json({});
-  } catch (error) {
-    if (error instanceof BadRequestError || error instanceof ForbiddenError) {
-      return c.json({ error: error.message }, error.status_code);
-    }
-
-    throw error;
-  }
+  return c.json({});
 });
 
 export default feeds;

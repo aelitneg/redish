@@ -81,3 +81,71 @@ export const feeRelations = relations(feed, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export const oauthClient = pgTable('oauth_clients', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  secret: text('secret').notNull(),
+  redirect: text('redirect'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const oauthClientRelations = relations(oauthClient, ({ many }) => ({
+  authorizations: many(oauthAuthorization),
+  tokens: many(oauthToken),
+}));
+
+export const oauthAuthorization = pgTable('oauth_authorizations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  code: text('code').notNull().unique(),
+  state: text('state'),
+  clientId: uuid('client_id')
+    .notNull()
+    .references(() => oauthClient.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  used: boolean('used').notNull().default(false),
+});
+
+export const oauthAuthorizationRelations = relations(
+  oauthAuthorization,
+  ({ one }) => ({
+    client: one(oauthClient, {
+      fields: [oauthAuthorization.clientId],
+      references: [oauthClient.id],
+    }),
+    user: one(user, {
+      fields: [oauthAuthorization.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
+export const oauthToken = pgTable('oauth_tokens', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  accessToken: text('access_token').notNull().unique(),
+  clientId: uuid('client_id')
+    .notNull()
+    .references(() => oauthClient.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const oauthTokenRelations = relations(oauthToken, ({ one }) => ({
+  client: one(oauthClient, {
+    fields: [oauthToken.clientId],
+    references: [oauthClient.id],
+  }),
+  user: one(user, {
+    fields: [oauthToken.userId],
+    references: [user.id],
+  }),
+}));

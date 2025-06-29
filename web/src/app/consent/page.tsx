@@ -1,10 +1,11 @@
 'use client';
 
-import { ItemForm } from '@/components/ItemForm';
+import { Suspense } from 'react';
 import { Loading } from '@/components/Loading';
 import { useSession } from '@/hooks/useSession';
+import { ConsentForm } from '@/components/ConsentForm';
 
-export default function Home() {
+export default function Consent() {
   const session = useSession();
 
   if (!session) {
@@ -14,7 +15,9 @@ export default function Home() {
   return (
     <main className="flex-1 flex justify-center items-center">
       <div className="flex flex-col items-center w-full p-2">
-        <ItemForm />
+        <Suspense>
+          <ConsentForm />
+        </Suspense>
       </div>
     </main>
   );

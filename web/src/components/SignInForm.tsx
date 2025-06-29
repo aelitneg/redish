@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
 import { Button } from './ui/button';
@@ -25,6 +25,7 @@ const formSchema = z.object({
 
 export function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,7 +46,9 @@ export function SignInForm() {
           toast.error(`sign in failed - ${error.message}`);
         },
         onSuccess: () => {
-          router.push('/');
+          const redirect = searchParams.get('redirect');
+          const redirectPath = redirect ? decodeURIComponent(redirect) : '/';
+          router.push(redirectPath);
         },
       },
     );

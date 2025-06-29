@@ -1,7 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { auth } from './auth.js';
+import { BaseError } from './utils/errors.js';
 import feeds from './routes/feeds.js';
+import oauth from './routes/oauth.js';
 
 const app = new Hono<{
   // Make user and session a part of context
@@ -56,6 +58,7 @@ app.on(['POST', 'GET'], '/auth/*', (c) => {
  * Application Routes
  */
 app.route('/feeds', feeds);
+app.route('/oauth', oauth);
 
 /**
  * Not Found Handler
@@ -68,6 +71,10 @@ app.notFound((c) => {
  * Error Handler
  */
 app.onError((error, c) => {
+  if (error instanceof BaseError) {
+    return c.json({ error: error.message }, error.status_code);
+  }
+
   console.error(error);
   return c.json({ error: 'Internal Server Error' }, 500);
 });

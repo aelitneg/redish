@@ -29,7 +29,7 @@ export const auth = betterAuth({
       // Check if this is a sign-up endpoint
       if (ctx.path.startsWith('/sign-up')) {
         const newSession = ctx.context.newSession;
-        
+
         // If a new session was created (successful sign up)
         if (newSession) {
           try {
