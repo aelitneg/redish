@@ -10,15 +10,28 @@
     "format:server": "prettier --write server/",
     "format:web": "prettier --write web/",
     "lint": "npm --prefix ./server run lint && npm --prefix ./web run lint",
-    "lint:server": "--prefix ./server run lint",
-    "lint:web": "npm --prefix ./web run lint"
+    "lint:server": "npm --prefix ./server run lint",
+    "lint:web": "npm --prefix ./web run lint",
+    "pre-commit": "lint-staged && npm run lint"
   },
   "devDependencies": {
     "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.4.2"
   },
   "workspaces": [
     "server",
     "web"
-  ]
+  ],
+  "lint-staged": {
+    "server/**/*.{ts,tsx,js}": [
+      "prettier --write"
+    ],
+    "web/**/*.{ts,tsx,js,jsx}": [
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
 }
