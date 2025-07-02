@@ -9,7 +9,6 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-    restart: always
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
@@ -18,22 +17,22 @@ services:
 
   server:
     build:
-      args:
-        NODE_ENV: ${NODE_ENV:-development}
+      target: development
     volumes:
       - ./server:/app
       - /app/node_modules
     depends_on:
       postgres:
         condition: service_healthy
-    command: npm run dev
 
   web:
     build:
+      target: development
     volumes:
       - ./web:/app
       - /app/node_modules
-    command: npm run dev -- -p 8080
+    environment:
+      - NEXT_PUBLIC_API_URL=${SERVER_URL}
 
 volumes:
   postgres:
