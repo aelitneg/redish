@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { oauthService } from '../services/oauthService';
-import { BadRequestError, ForbiddenError } from '../utils/errors';
-import { auth } from '../auth';
+import { oauthService } from '../services/oauthService.js';
+import { BadRequestError, ForbiddenError } from '../utils/errors.js';
+import { auth } from '../auth.js';
 
 const oauth = new Hono<{
   // Make user and session a part of context

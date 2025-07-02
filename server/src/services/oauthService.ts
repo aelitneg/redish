@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 import { and, eq, gt } from 'drizzle-orm';
-import { db } from '../db';
-import { oauthClient, oauthAuthorization, oauthToken } from '../db/schema';
+import { db } from '../db/index.js';
+import { oauthClient, oauthAuthorization, oauthToken } from '../db/schema.js';
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from '../utils/errors';
-import { isValidUUID } from '../utils/isValidUUID';
+} from '../utils/errors.js';
+import { isValidUUID } from '../utils/isValidUUID.js';
 
 /**
  * Get OAuth client by ID
