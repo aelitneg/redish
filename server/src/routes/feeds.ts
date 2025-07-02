@@ -36,7 +36,7 @@ feeds.use('*', async (c, next) => {
  * Create a new empty feed
  */
 feeds.post('/', async (c) => {
-  const feedId = await feedsService.createFeed(c.get('session')?.userId!);
+  const feedId = await feedsService.createFeed(c.get('session')!.userId);
   return c.json({ feedId });
 });
 
@@ -44,7 +44,7 @@ feeds.post('/', async (c) => {
  * List all feeds for a user
  */
 feeds.get('/', async (c) => {
-  const feeds = await feedsService.listFeeds(c.get('session')?.userId!);
+  const feeds = await feedsService.listFeeds(c.get('session')!.userId);
   return c.json(feeds);
 });
 
@@ -55,7 +55,7 @@ feeds.post('/:id/items', async (c) => {
   const feedId = c.req.param('id');
   const [link] = c.req.queries('link') ?? [];
 
-  await feedsService.addItemToFeed(c.get('session')?.userId!, feedId, link);
+  await feedsService.addItemToFeed(c.get('session')!.userId, feedId, link);
 
   return c.json({});
 });

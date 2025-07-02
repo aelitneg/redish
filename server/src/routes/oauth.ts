@@ -73,7 +73,7 @@ oauth.post('/token', async (c) => {
       const credentials = atob(authHeader.slice(6)).split(':');
       clientId = credentials[0];
       clientSecret = credentials[1];
-    } catch (error) {
+    } catch {
       throw new BadRequestError('invalid authorization header');
     }
   } else {

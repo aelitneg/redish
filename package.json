@@ -8,7 +8,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:server": "prettier --write server/",
-    "format:web": "prettier --write web/"
+    "format:web": "prettier --write web/",
+    "lint": "npm --prefix ./server run lint && npm --prefix ./web run lint",
+    "lint:server": "--prefix ./server run lint",
+    "lint:web": "npm --prefix ./web run lint"
   },
   "devDependencies": {
     "husky": "^9.1.7",
