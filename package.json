@@ -1,0 +1,21 @@
+{
+  "name": "redish",
+  "version": "0.2.0",
+  "description": "Save links to an RSS feed you can ignore from anywhere.",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:server": "prettier --write server/",
+    "format:web": "prettier --write web/"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "prettier": "^3.4.2"
+  },
+  "workspaces": [
+    "server",
+    "web"
+  ]
+}
