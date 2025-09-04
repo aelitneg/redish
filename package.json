@@ -19,10 +19,6 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.4.2"
   },
-  "workspaces": [
-    "server",
-    "web"
-  ],
   "lint-staged": {
     "server/**/*.{ts,tsx,js}": [
       "prettier --write"
