@@ -98,11 +98,17 @@ export function ItemForm() {
   // Apply filtering when toggle state changes
   useEffect(() => {
     const currentValue = form.getValues('link');
+    console.debug('ItemForm - useEffect', { currentValue, originalUrl });
+
     if (currentValue) {
       if (isFilterEnabled) {
         // Apply filter to current URL (use original if available, otherwise current)
         const urlToFilter = originalUrl || currentValue;
+        console.debug('ItemForm - useEffect', { urlToFilter });
+
         const filtered = filterUrl(urlToFilter);
+        console.debug('ItemForm - useEffect', { filtered });
+
         if (filtered !== currentValue) {
           form.setValue('link', filtered);
         }
@@ -115,9 +121,14 @@ export function ItemForm() {
     }
   }, [isFilterEnabled, form, filterUrl, originalUrl]);
 
-  function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+  async function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    event.preventDefault();
+
     // Get the pasted content
-    const pastedText = event.clipboardData.getData('text');
+    const pastedText = await navigator.clipboard.readText();
+    console.debug('ItemForm - handlePaste', { pastedText });
+
+    if (!pastedText) return;
 
     // Store the original URL
     setOriginalUrl(pastedText);
@@ -125,8 +136,7 @@ export function ItemForm() {
     // Filter the URL if filtering is enabled
     const filteredUrl = filterUrl(pastedText);
 
-    // Always prevent default and set the appropriate value
-    event.preventDefault();
+    // Update the value in the form
     form.setValue('link', filteredUrl);
   }
 
