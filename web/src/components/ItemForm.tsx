@@ -122,13 +122,14 @@ export function ItemForm() {
   }, [isFilterEnabled, form, filterUrl, originalUrl]);
 
   async function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
-    event.preventDefault();
-
-    // Get the pasted content
+    // CRITICAL: Read clipboard BEFORE preventing default to maintain user gesture
     const pastedText = await navigator.clipboard.readText();
     console.debug('ItemForm - handlePaste', { pastedText });
 
     if (!pastedText) return;
+
+    // Prevent default after reading from clipboard
+    event.preventDefault();
 
     // Store the original URL
     setOriginalUrl(pastedText);
