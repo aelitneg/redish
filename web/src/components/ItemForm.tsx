@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -63,7 +63,7 @@ export function ItemForm() {
     linkLabel: '',
     buttonText: '',
   });
-  const [originalUrl, setOriginalUrl] = useState<string>('');
+  const originalUrlRef = useRef<string>('');
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
   const { isFilterEnabled, toggleFilter, filterUrl } = useQueryStringFilter();
@@ -95,51 +95,42 @@ export function ItemForm() {
     },
   });
 
-  // Apply filtering when toggle state changes
+  // Watch for changes to link field
+  const linkField = form.watch('link');
+
+  // Handle form changes
   useEffect(() => {
-    const currentValue = form.getValues('link');
-    console.debug('ItemForm - useEffect', { currentValue, originalUrl });
+    if (!linkField) return;
 
-    if (currentValue) {
+    // If this is a new URL, save as original and filter if needed
+    if (linkField !== originalUrlRef.current) {
+      originalUrlRef.current = linkField;
+
       if (isFilterEnabled) {
-        // Apply filter to current URL (use original if available, otherwise current)
-        const urlToFilter = originalUrl || currentValue;
-        console.debug('ItemForm - useEffect', { urlToFilter });
-
-        const filtered = filterUrl(urlToFilter);
-        console.debug('ItemForm - useEffect', { filtered });
-
-        if (filtered !== currentValue) {
+        const filtered = filterUrl(linkField);
+        if (filtered !== linkField) {
           form.setValue('link', filtered);
-        }
-      } else {
-        // Restore original URL if available
-        if (originalUrl && originalUrl !== currentValue) {
-          form.setValue('link', originalUrl);
         }
       }
     }
-  }, [isFilterEnabled, form, filterUrl, originalUrl]);
+  }, [linkField, isFilterEnabled, filterUrl, form]);
 
-  async function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
-    // CRITICAL: Read clipboard BEFORE preventing default to maintain user gesture
-    const pastedText = await navigator.clipboard.readText();
-    console.debug('ItemForm - handlePaste', { pastedText });
+  // Handle filter toggle changes
+  useEffect(() => {
+    if (!originalUrlRef.current) return;
 
-    if (!pastedText) return;
-
-    // Prevent default after reading from clipboard
-    event.preventDefault();
-
-    // Store the original URL
-    setOriginalUrl(pastedText);
-
-    // Filter the URL if filtering is enabled
-    const filteredUrl = filterUrl(pastedText);
-
-    // Update the value in the form
-    form.setValue('link', filteredUrl);
-  }
+    const currentValue = form.getValues('link');
+    if (isFilterEnabled) {
+      const filtered = filterUrl(originalUrlRef.current);
+      if (filtered !== currentValue) {
+        form.setValue('link', filtered);
+      }
+    } else {
+      if (originalUrlRef.current !== currentValue) {
+        form.setValue('link', originalUrlRef.current);
+      }
+    }
+  }, [isFilterEnabled, filterUrl, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -181,7 +172,7 @@ export function ItemForm() {
                 {labels.linkLabel}
               </FormLabel>
               <FormControl>
-                <Input type="url" {...field} onPaste={handlePaste} />
+                <Input type="url" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
