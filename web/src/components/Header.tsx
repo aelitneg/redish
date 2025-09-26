@@ -13,10 +13,11 @@ import {
 } from './ui/dropdown-menu';
 import { MenuIcon, RssIcon, LogOutIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSession } from '@/hooks/useSession';
 
 export function Header() {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const session = useSession();
   const [feedId, setFeedId] = useState<string | null>(null);
 
   useEffect(() => {
