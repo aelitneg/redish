@@ -13,23 +13,30 @@ export function useSession() {
   useEffect(() => {
     if (isPending) return;
 
+    // Session gained since last render, user signing in
+    const wasSignedIn = prevSessionRef.current === null && session !== null;
+
     // Session cleared since last render, user signing out
     const wasSignedOut = prevSessionRef.current !== null && session === null;
+
     prevSessionRef.current = session;
 
+    // Sign-in redirect handled in SignInForm
+    if (wasSignedIn && pathname === '/signin') return;
+
     if (!session && !wasSignedOut) {
-      // Don't redirect if we're already on auth pages
+      // Public pages do not require redirect
       if (pathname === '/signin' || pathname === '/signup') {
         return;
       }
 
-      // For root page, redirect directly to signin without redirect param
+      // Redirect param not required for root page (default behaviour)
       if (pathname === '/') {
         router.push('/signin');
         return;
       }
 
-      // For other protected pages, include redirect param
+      // Use redirect param to return to previous page after sign-in
       const redirect = encodeURIComponent(pathname);
       router.push(`/signin?redirect=${redirect}`);
     }
