@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
 import { Button } from './ui/button';
@@ -24,7 +24,6 @@ const formSchema = z.object({
 });
 
 export function SignInForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,7 +47,8 @@ export function SignInForm() {
         onSuccess: () => {
           const redirect = searchParams.get('redirect');
           const redirectPath = redirect ? decodeURIComponent(redirect) : '/';
-          router.push(redirectPath);
+          // Use window.location.href for iOS Safari compatibility
+          window.location.href = redirectPath;
         },
       },
     );
