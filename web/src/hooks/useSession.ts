@@ -19,8 +19,7 @@ export function useSession() {
 
     if (!session && !wasSignedOut) {
       // Paths excluded from redirect redirect param
-      if (pathname === '/signin' || pathname === '/') {
-        router.push('/signin');
+      if (['/signin', '/signup', '/'].includes(pathname)) {
         return;
       }
 
