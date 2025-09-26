@@ -18,11 +18,18 @@ export function useSession() {
     prevSessionRef.current = session;
 
     if (!session && !wasSignedOut) {
-      // Paths excluded from redirect redirect param
-      if (['/signin', '/signup', '/'].includes(pathname)) {
+      // Don't redirect if we're already on auth pages
+      if (pathname === '/signin' || pathname === '/signup') {
         return;
       }
 
+      // For root page, redirect directly to signin without redirect param
+      if (pathname === '/') {
+        router.push('/signin');
+        return;
+      }
+
+      // For other protected pages, include redirect param
       const redirect = encodeURIComponent(pathname);
       router.push(`/signin?redirect=${redirect}`);
     }
