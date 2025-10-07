@@ -1,5 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
+import { nanoid } from 'nanoid';
 import { fileStorage } from '../storage/fileStorage.js';
 import { db } from '../db/index.js';
 import { feed } from '../db/schema.js';
@@ -9,6 +10,7 @@ import {
   NotFoundError,
 } from '../utils/errors.js';
 import { isValidUUID } from '../utils/isValidUUID.js';
+import { parseLink } from '../utils/parseLink.js';
 
 const DEFAULT_TITLE = 'Redish';
 const DEFAULT_DESCRIPTION =
@@ -152,14 +154,24 @@ function addItemToFeed(
       throw new BadRequestError('link is required');
     }
 
+    const { title, description } = await parseLink(link);
+
     const filePath = `${userId}/${feedRecord.id}.xml`;
     const file = await fileStorage.read(filePath);
     const feedContent = xmlParser.parse(file);
-
     const channel = feedContent[1].rss[0].channel;
-    channel.push({
-      item: [{ title: [{ '#text': link }] }, { link: [{ '#text': link }] }],
-    });
+
+    const item = {
+      item: [
+        { guid: [{ '#text': nanoid() }] },
+        { title: [{ '#text': title }] },
+        { description: [{ '#text': description }] },
+        { link: [{ '#text': link }] },
+        { pubDate: [{ '#text': new Date().toISOString() }] },
+      ],
+    };
+
+    channel.unshift(item);
 
     await fileStorage.write(filePath, xmlBuilder.build(feedContent));
   });
