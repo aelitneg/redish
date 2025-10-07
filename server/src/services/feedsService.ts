@@ -171,7 +171,17 @@ function addItemToFeed(
       ],
     };
 
-    channel.unshift(item);
+    const insertIndex = channel.findIndex(
+      (element: { item?: [] }) => element.item,
+    );
+    console.debug('insertIndex', insertIndex);
+    if (insertIndex === -1) {
+      // No existing items, add to end
+      channel.push(item);
+    } else {
+      // Insert before the first item
+      channel.splice(insertIndex, 0, item);
+    }
 
     await fileStorage.write(filePath, xmlBuilder.build(feedContent));
   });
