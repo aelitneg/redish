@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Unreadly",
+  "version": "0.1.0",
+  "description": "Save links to an RSS feed you can ignore from anywhere.",
+  "homepage_url": "https://github.com/aelitneg/redish",
+  "icons": {
+    "48": "icons/icon-dark-48.png",
+    "96": "icons/icon-dark-96.png"
+  },
+  "browser_action": {
+    "default_icon": "icons/icon-dark-32.png",
+    "default_title": "Unreadly",
+    "default_popup": "popup/index.html"
+  },
+  "permissions": ["activeTab"]
+}
