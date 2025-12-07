@@ -218,7 +218,9 @@ export function ItemForm() {
           </Collapsible>
         </div>
 
-        <Button type="submit">{labels.buttonText}</Button>
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {labels.buttonText}
+        </Button>
       </form>
     </Form>
   );
