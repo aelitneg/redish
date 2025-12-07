@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { Button } from './ui/button';
@@ -12,7 +13,6 @@ import {
   DropdownMenuSeparator,
 } from './ui/dropdown-menu';
 import { MenuIcon, RssIcon, LogOutIcon } from 'lucide-react';
-import { toast } from 'sonner';
 import { useSession } from '@/hooks/useSession';
 
 export function Header() {
@@ -46,18 +46,6 @@ export function Header() {
     })();
   }, [session]);
 
-  const handleCopyFeedUrl = async () => {
-    if (!feedId) return;
-    try {
-      await navigator.clipboard.writeText(
-        `${process.env.NEXT_PUBLIC_API_URL}/feeds/${feedId}`,
-      );
-      toast.success('Feed URL copied to clipboard');
-    } catch {
-      toast.error('Failed to copy feed URL');
-    }
-  };
-
   async function signOut() {
     await authClient.signOut();
     router.replace('/signin');
@@ -65,7 +53,9 @@ export function Header() {
 
   return (
     <header className="p-4 flex">
-      <h1 className="flex-1 text-4xl font-semibold">redish</h1>
+      <h1 className="flex-1 text-4xl font-semibold">
+        <Link href="/">redish</Link>
+      </h1>
       {session && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -76,10 +66,10 @@ export function Header() {
           <DropdownMenuContent align="end">
             {feedId && (
               <DropdownMenuItem
-                onClick={handleCopyFeedUrl}
+                onClick={() => router.push('/feeds')}
                 className="flex items-center gap-2 w-full"
               >
-                <RssIcon className="size-4" /> feed url
+                <RssIcon className="size-4" /> feeds
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
