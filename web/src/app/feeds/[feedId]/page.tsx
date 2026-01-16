@@ -27,12 +27,39 @@ type FeedItem = {
   pubDate: string;
 };
 
+type Feed = {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+};
+
 export default function FeedDetail() {
   const params = useParams<{ feedId: string }>();
+  const [feed, setFeed] = useState<Feed | null>(null);
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingGuid, setDeletingGuid] = useState<string | null>(null);
   const session = useSession();
+
+  const fetchFeed = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/feeds`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      console.error('Fetch failed', response.status, response.statusText);
+      toast.error('Failed to fetch feed');
+      return;
+    }
+
+    const feeds: Feed[] = await response.json();
+    const currentFeed = feeds.find((f) => f.id === params.feedId);
+    if (currentFeed) {
+      setFeed(currentFeed);
+    }
+  };
 
   const fetchItems = async () => {
     const response = await fetch(
@@ -56,6 +83,7 @@ export default function FeedDetail() {
   };
 
   useEffect(() => {
+    fetchFeed();
     fetchItems();
   }, [params.feedId]);
 
@@ -91,7 +119,7 @@ export default function FeedDetail() {
 
   return (
     <main className="mt-4 p-4">
-      <h2 className="text-3xl font-bold">feed items</h2>
+      <h2 className="text-3xl font-bold">{feed?.title ?? 'Feed'}</h2>
       {items.length === 0 ? (
         <p className="py-4 text-muted-foreground">No items in this feed yet.</p>
       ) : (
