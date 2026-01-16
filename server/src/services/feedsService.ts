@@ -187,10 +187,113 @@ function addItemToFeed(
   });
 }
 
+type FeedItem = {
+  guid: string;
+  title: string;
+  description: string;
+  link: string;
+  pubDate: string;
+};
+
+/**
+ * Get all items from a feed.
+ */
+async function getFeedItems(
+  userId: string,
+  feedId: string,
+): Promise<FeedItem[]> {
+  if (!isValidUUID(feedId)) {
+    throw new BadRequestError('invalid feed ID');
+  }
+
+  const feedRecord = await db.query.feed.findFirst({
+    columns: { id: true },
+    where: and(eq(feed.id, feedId), eq(feed.userId, userId)),
+  });
+
+  if (!feedRecord) {
+    throw new ForbiddenError();
+  }
+
+  const filePath = `${userId}/${feedRecord.id}.xml`;
+  const file = await fileStorage.read(filePath);
+  const feedContent = xmlParser.parse(file);
+  const channel = feedContent[1].rss[0].channel;
+
+  const items: FeedItem[] = [];
+  for (const element of channel) {
+    if (element.item) {
+      items.push({
+        guid: element.item.find((e: { guid?: [] }) => e.guid)?.guid[0]['#text'],
+        title: element.item.find((e: { title?: [] }) => e.title)?.title[0][
+          '#text'
+        ],
+        description: element.item.find(
+          (e: { description?: [] }) => e.description,
+        )?.description[0]['#text'],
+        link: element.item.find((e: { link?: [] }) => e.link)?.link[0]['#text'],
+        pubDate: element.item.find((e: { pubDate?: [] }) => e.pubDate)
+          ?.pubDate[0]['#text'],
+      });
+    }
+  }
+
+  return items;
+}
+
+/**
+ * Remove an item from a feed by its guid.
+ */
+function removeItemFromFeed(
+  userId: string,
+  feedId: string,
+  itemGuid: string,
+): Promise<void> {
+  return db.transaction(async (tx) => {
+    const feedRecord = await tx.query.feed.findFirst({
+      columns: { id: true },
+      where: and(eq(feed.id, feedId), eq(feed.userId, userId)),
+    });
+
+    if (!feedRecord) {
+      throw new ForbiddenError();
+    }
+
+    if (!itemGuid) {
+      throw new BadRequestError('item guid is required');
+    }
+
+    const filePath = `${userId}/${feedRecord.id}.xml`;
+    const file = await fileStorage.read(filePath);
+    const feedContent = xmlParser.parse(file);
+    const channel = feedContent[1].rss[0].channel;
+
+    const itemIndex = channel.findIndex(
+      (element: { item?: { guid?: { '#text': string }[] }[] }) => {
+        if (!element.item) return false;
+        const guidElement = element.item.find(
+          (e: { guid?: { '#text': string }[] }) => e.guid,
+        );
+        return guidElement?.guid?.[0]['#text'] === itemGuid;
+      },
+    );
+
+    if (itemIndex === -1) {
+      throw new NotFoundError('Item not found', itemGuid);
+    }
+
+    channel.splice(itemIndex, 1);
+
+    await fileStorage.write(filePath, xmlBuilder.build(feedContent));
+  });
+}
+
 export const feedsService = {
   createFeed,
   getFeed,
   getPublicFeed,
   listFeeds,
   addItemToFeed,
+  getFeedItems,
+  removeItemFromFeed,
 };

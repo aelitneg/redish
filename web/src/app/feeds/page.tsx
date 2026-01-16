@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { RssIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -58,7 +59,9 @@ export default function Feeds() {
         return (
           <div key={feed.id} className="flex py-4">
             <div className="flex-1">
-              <h3 className="font-bold text-xl">{feed.title}</h3>
+              <Link href={`/feeds/${feed.id}`} className="hover:underline">
+                <h3 className="font-bold text-xl">{feed.title}</h3>
+              </Link>
               <p>{feed.description}</p>
             </div>
             <div className="flex items-center">

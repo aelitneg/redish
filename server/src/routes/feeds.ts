@@ -60,4 +60,33 @@ feeds.post('/:id/items', async (c) => {
   return c.json({});
 });
 
+/**
+ * List all items in a feed
+ */
+feeds.get('/:id/items', async (c) => {
+  const feedId = c.req.param('id');
+  const items = await feedsService.getFeedItems(
+    c.get('session')!.userId,
+    feedId,
+  );
+
+  return c.json(items);
+});
+
+/**
+ * Delete an item from a feed
+ */
+feeds.delete('/:id/items/:itemGuid', async (c) => {
+  const feedId = c.req.param('id');
+  const itemGuid = c.req.param('itemGuid');
+
+  await feedsService.removeItemFromFeed(
+    c.get('session')!.userId,
+    feedId,
+    itemGuid,
+  );
+
+  return c.json({});
+});
+
 export default feeds;
